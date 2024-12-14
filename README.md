@@ -1,5 +1,9 @@
 ## TZ
 
+### Setup
+
+Go to `Date & Time` in MacOS system settings and unselect `Set time and date automatically` and `Set time zone automatically using your current location`.  
+
 ### Things to do
 - Implement better UX by e.g. filtering subregion by alphabet indexes
 - possibly implement using TTY that allows substring-based search if a package exists
