@@ -1,14 +1,32 @@
 require 'tty-prompt'
 require 'json'
 
-
 class TimezoneCLI
+  RECENT_SELECTIONS_FILE = 'recent_selections.json'
+
   def initialize
     @options = Hash.new
+    @recent_selections = read_recent_selections
     map_timezones
     select_input_type
     make_selection
     change_timezone
+  end
+
+  def read_recent_selections
+    if File.exist?(RECENT_SELECTIONS_FILE)
+      JSON.parse(File.read(RECENT_SELECTIONS_FILE))
+    else
+      [] # return empty array if file doesn't exist to avoid errors
+    end
+  end
+
+  def write_recent_selection(region, subregion)
+    formatted_selection = subregion.nil? || subregion.empty? ? region : "#{region}/#{subregion}"
+    @recent_selections << formatted_selection
+    @recent_selections.uniq!
+    @recent_selections.shift if @recent_selections.size > 5
+    File.write(RECENT_SELECTIONS_FILE, @recent_selections.to_json)
   end
 
   def change_timezone
@@ -24,17 +42,19 @@ class TimezoneCLI
 
   def select_target_region
     @target_region = TTY::Prompt.new.select("Select region:", @options.keys, per_page: 15)
-    puts "Selected region: #{@target_region}" # Debug statement to check the selected region
   end
 
   def make_selection
     case @input_type
     when "Recent"
-      # Add logic for "Recent" option
-      # Will need to remember recent selections
-      puts "`Recent` functionality not implemented yet."
-      select_target_region
-      select_target_subregion unless @target_region == "GMT"
+      if @recent_selections.empty?
+        puts "No recent selections available."
+        select_target_region
+        select_target_subregion unless @target_region == "GMT"
+      else
+        recent_selection = TTY::Prompt.new.select("Select recent selection:", @recent_selections, per_page: 5)
+        @target_region, @target_subregion = recent_selection.split('/')
+      end
     when "By Region"
       select_target_region
       select_target_subregion unless @target_region == "GMT"
@@ -47,6 +67,8 @@ class TimezoneCLI
     else
       puts "Invalid input type selected."
     end
+
+    write_recent_selection(@target_region, @target_subregion)
   end
 
   def select_input_type
