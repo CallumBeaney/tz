@@ -25,7 +25,7 @@ class TimezoneCLI
     formatted_selection = subregion.nil? || subregion.empty? ? region : "#{region}/#{subregion}"
     @recent_selections << formatted_selection
     @recent_selections.uniq! # remove duplicates from array
-    @recent_selections.shift if @recent_selections.size > 5
+    @recent_selections.shift if @recent_selections.size > 10
     File.write(RECENT_SELECTIONS_FILE, @recent_selections.to_json)
   end
 
