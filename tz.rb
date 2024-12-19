@@ -7,6 +7,7 @@ class TimezoneCLI
   def initialize
     @options = Hash.new
     @recent_selections = read_recent_selections
+    @recent_array_length = 10
     map_timezones
     select_input_type
     make_selection
@@ -25,7 +26,7 @@ class TimezoneCLI
     formatted_selection = subregion.nil? || subregion.empty? ? region : "#{region}/#{subregion}"
     @recent_selections << formatted_selection
     @recent_selections.uniq! # remove duplicates from array
-    @recent_selections.shift if @recent_selections.size > 5
+    @recent_selections.shift if @recent_selections.size > @recent_array_length
     File.write(RECENT_SELECTIONS_FILE, @recent_selections.to_json)
   end
 
@@ -52,7 +53,7 @@ class TimezoneCLI
         select_target_region
         select_target_subregion unless @target_region == "GMT"
       else
-        recent_selection = TTY::Prompt.new.select("Select recent selection:", @recent_selections, per_page: 10)
+        recent_selection = TTY::Prompt.new.select("Select recent selection:", @recent_selections, per_page: @recent_array_length)
         @target_region, @target_subregion = recent_selection.split('/')
       end
     when "By Region"
