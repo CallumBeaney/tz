@@ -24,7 +24,7 @@ class TimezoneCLI
   def write_recent_selection(region, subregion)
     formatted_selection = subregion.nil? || subregion.empty? ? region : "#{region}/#{subregion}"
     @recent_selections << formatted_selection
-    @recent_selections.uniq!
+    @recent_selections.uniq! # remove duplicates from array
     @recent_selections.shift if @recent_selections.size > 5
     File.write(RECENT_SELECTIONS_FILE, @recent_selections.to_json)
   end
@@ -52,16 +52,10 @@ class TimezoneCLI
         select_target_region
         select_target_subregion unless @target_region == "GMT"
       else
-        recent_selection = TTY::Prompt.new.select("Select recent selection:", @recent_selections, per_page: 5)
+        recent_selection = TTY::Prompt.new.select("Select recent selection:", @recent_selections, per_page: 10)
         @target_region, @target_subregion = recent_selection.split('/')
       end
     when "By Region"
-      select_target_region
-      select_target_subregion unless @target_region == "GMT"
-    when "Search A-Z"
-      # Add logic for "Search A-Z" option
-      # maybe .map to filter timezones by letters entered
-      puts "`Search A-Z` functionality not implemented yet."
       select_target_region
       select_target_subregion unless @target_region == "GMT"
     else
@@ -72,7 +66,7 @@ class TimezoneCLI
   end
 
   def select_input_type
-    @input_type = TTY::Prompt.new.select("Select input type:", ["Recent", "By Region", "Search A-Z"], per_page: 3)
+    @input_type = TTY::Prompt.new.select("Select input type:", ["Recent", "By Region"], per_page: 2)
   end
 
   def map_timezones
@@ -82,7 +76,7 @@ class TimezoneCLI
     parsed_lines.slice!(0) # remove "Time Zones:"
 
     parsed_lines.each do |line|
-      split = line.split('/') # [" America", "Argentina", "Buenos_Aires"] 
+      split = line.split('/') # ["America", "Argentina", "Buenos_Aires"]
       region = split.first.strip # "America"
 
       @options[region] = [] unless @options.has_key?(region) 
