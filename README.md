@@ -1,7 +1,7 @@
 ## TZ (for MacOS)
 
 ### Why use this
-IDK maybe you're in place A and you're working on something for place B and the backend doesn't have timezone handling implemented and Simulator follows the MacOS system timezone which is STUPID but you hate going back and forth through the GUI so you spend your precious free moments, your life Ticking Away, to write a script that makes doing that easier for yourself  
+IDK maybe you move places a lot and you're in place A and you're working on something for place B and the backend doesn't have timezone handling implemented and Simulator is locked to follow the MacOS system timezone which is STUPID but you hate going back and forth through the GUI so you spend your precious free moments, your life Ticking Away, to write a script that makes doing that easier for yourself  
 
 This is just a wrapper around some MacOS system commands.  
 
